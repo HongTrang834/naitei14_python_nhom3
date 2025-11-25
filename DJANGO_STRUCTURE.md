@@ -1,4 +1,4 @@
-# Cấu Trúc Thư Mục Django "Cổ Điển" (Templates)
+# Cấu Trúc Thư Mục Django (Templates)
 
 ## 📁 Cấu trúc thư mục hiện tại:
 
