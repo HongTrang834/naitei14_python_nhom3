@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.crypto import get_random_string
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
@@ -14,13 +14,15 @@ from django.core.cache import cache
 from django.utils import timezone
 from django.db import transaction
 from django.views.decorators.http import require_POST
-from django.contrib.auth.views import PasswordChangeView
 from datetime import timedelta
+from django.urls import reverse, reverse_lazy
+from django.contrib.auth.views import PasswordChangeView
 
+from myapp.forms import UserUpdateForm, VNPasswordChangeForm
+from myapp.models import Product
 from .constants import ACTIVATION_TOKEN_LENGTH, RESET_TOKEN_LENGTH, RESET_TOKEN_EXPIRY_HOURS, ACTIVATION_TOKEN_EXPIRY_HOURS
 
 User = get_user_model()
-from .forms import UserUpdateForm, VNPasswordChangeForm
 
 # Create your views here.
 
@@ -28,8 +30,10 @@ def index(request):
     """
     View hiển thị trang index của myapp
     """
+    featured_products = Product.objects.filter(is_featured=True).order_by('-id')[:8]
+    
     context = {
-        'user_name': 'Django Developer',  # Dữ liệu truyền vào template
+        'featured_products': featured_products
     }
     return render(request, 'myapp/index.html', context)
 
@@ -185,7 +189,6 @@ def logout_user(request):
     return redirect('myapp:login')
 
 
-
 @login_required
 def update_profile(request):
     """
@@ -208,7 +211,6 @@ def update_profile(request):
         return redirect('myapp:profile')
 
     return redirect('myapp:profile')
-
 
 @login_required(login_url="myapp:login")
 def profile(request):
@@ -255,8 +257,8 @@ class CustomPasswordChangeView(PasswordChangeView):
             messages.error(self.request, err)
 
         return super().form_invalid(form)
-    
-    
+
+
 def activate_account(request, token):
     """
     Kích hoạt tài khoản qua email

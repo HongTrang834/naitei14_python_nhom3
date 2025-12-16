@@ -83,4 +83,3 @@ class VNPasswordChangeForm(PasswordChangeForm):
         }
 
         return translations.get(msg, msg)
-
